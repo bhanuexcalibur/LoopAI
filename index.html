@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loop AI &times; Bhanu Kumar &middot; Proof of Work</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+    :root{
+      --bg:       #05060a;
+      --bg2:      #0a0c11;
+      --bg3:      #0f1118;
+      --bg4:      #151a24;
+      --bg5:      #1b2030;
+      --bdr:      rgba(255,255,255,0.06);
+      --bmd:      rgba(255,255,255,0.12);
+      --blg:      rgba(255,255,255,0.20);
+      --t1:       #f0f2f7;
+      --t2:       #8b92a0;
+      --t3:       #4a5160;
+      --accent:   #2dd4bf;
+      --accent-dim:  rgba(45,212,191,0.09);
+      --accent-glow: rgba(45,212,191,0.20);
+      --warm:     #fbbf24;
+      --warm-dim: rgba(251,191,36,0.08);
+    }
+
+    html{scroll-behavior:smooth;scroll-padding-top:64px;}
+    body{
+      background:var(--bg);color:var(--t1);
+      font-family:'Manrope',system-ui,sans-serif;
+      font-size:16px;line-height:1.6;font-weight:400;
+      -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    }
+
+    body::before{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(560px 380px at 8% 0%, rgba(45,212,191,0.06), transparent 60%),
+        radial-gradient(620px 400px at 92% 12%, rgba(251,191,36,0.04), transparent 60%);
+    }
+
+    ::selection{background:var(--accent-dim);color:var(--t1);}
+    a{color:inherit;text-decoration:none;}
+    img,svg{display:block;}
+    button{cursor:pointer;font-family:inherit;}
+
+    .pbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--warm));z-index:500;width:0%;transition:width 0.1s linear;}
+
+    .nav{
+      position:sticky;top:0;z-index:300;
+      background:rgba(5,6,10,0.90);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--bdr);padding:0 5vw;
+    }
+    .nav-i{
+      max-width:1200px;margin:0 auto;
+      display:flex;align-items:center;justify-content:space-between;
+      height:60px;gap:16px;
+    }
+    .nav-brand{
+      font-family:'JetBrains Mono',monospace;font-size:12px;
+      color:var(--t1);letter-spacing:0.02em;white-space:nowrap;
+      display:flex;align-items:center;gap:8px;text-decoration:none;
+    }
+    .nav-brand .dot{
+      width:5px;height:5px;border-radius:50%;background:var(--accent);
+      animation:dotpulse 2.4s ease-in-out infinite;
+    }
+    @keyframes dotpulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+    .nav-brand b{font-weight:600;color:var(--t1);}
+    .nav-brand span{color:var(--t3);}
+
+    .nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+    .np{
+      font-size:11.5px;font-weight:500;
+      padding:6px 12px;border-radius:5px;
+      border:1px solid transparent;color:var(--t2);
+      background:transparent;transition:all 0.12s;
+      white-space:nowrap;font-family:'JetBrains Mono',monospace;
+      letter-spacing:0.01em;
+    }
+    .np:hover{border-color:var(--bdr);color:var(--t1);background:var(--bg3);}
+    .np.cta{
+      background:var(--accent);border-color:var(--accent);
+      color:#000;font-weight:600;margin-left:8px;
+    }
+    .np.cta:hover{opacity:0.85;}
+
+    .hbg{
+      display:none;flex-direction:column;gap:5px;
+      background:none;border:none;padding:4px;flex-shrink:0;
+    }
+    .hbg span{display:block;width:18px;height:1.5px;background:var(--t1);border-radius:2px;transition:transform .3s,opacity .3s;}
+    .hbg.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+    .hbg.open span:nth-child(2){opacity:0;}
+    .hbg.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+    .mob-menu{
+      display:none;position:fixed;inset:0;top:60px;
+      background:var(--bg);z-index:290;
+      flex-direction:column;padding:24px 5vw;gap:0;
+      border-top:1px solid var(--bdr);
+    }
+    .mob-menu.open{display:flex;}
+    .mob-menu a{
+      display:block;font-size:16px;
+      font-family:'Newsreader',serif;font-style:italic;
+      color:var(--t1);padding:14px 0;border-bottom:1px solid var(--bdr);
+    }
+    .mob-menu a:last-child{border-bottom:none;}
+
+    @media(max-width:760px){
+      .nav-links{display:none;}
+      .hbg{display:flex;}
+    }
+
+    .wrap{max-width:1200px;margin:0 auto;padding:0 5vw;position:relative;z-index:1;}
+    section.part{padding:72px 0;border-bottom:1px solid var(--bdr);}
+
+    .rv{opacity:0;transform:translateY(12px);transition:opacity 0.5s ease,transform 0.5s ease;}
+    .rv.in{opacity:1;transform:none;}
+
+    .hero{padding:56px 5vw 40px;max-width:1200px;margin:0 auto;position:relative;z-index:1;border-bottom:1px solid var(--bdr);}
+    .hero-eyebrow{
+      font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+      letter-spacing:0.14em;text-transform:uppercase;color:var(--t3);
+      margin-bottom:20px;
+    }
+    .hero-hed{
+      font-family:'Newsreader',serif;font-weight:400;font-style:italic;
+      font-size:clamp(28px,6vw,54px);line-height:1.15;
+      color:var(--t1);margin-bottom:16px;letter-spacing:-0.01em;
+    }
+    .hero-sub{
+      font-size:15px;color:var(--t2);line-height:1.7;
+      max-width:680px;margin-bottom:0;
+    }
+
+    .part-hed{
+      font-family:'Newsreader',serif;font-weight:400;font-style:italic;
+      font-size:clamp(24px,4vw,42px);line-height:1.2;
+      color:var(--t1);margin-bottom:32px;letter-spacing:-0.01em;
+    }
+    .part-sub{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:20px;}
+
+    /* ===== OBSERVATION CARDS ===== */
+    .obs-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px 0;
+    }
+    @media(max-width:760px){
+      .obs-grid{grid-template-columns:1fr;}
+    }
+    .obs-card{
+      background:var(--bg3);border:1px solid var(--bdr);
+      border-radius:10px;padding:24px;
+    }
+    .obs-num{
+      font-family:'JetBrains Mono',monospace;
+      font-size:11px;font-weight:600;
+      letter-spacing:0.1em;text-transform:uppercase;
+      color:var(--accent);margin-bottom:12px;
+    }
+    .obs-title{
+      font-size:15px;font-weight:700;color:var(--t1);
+      margin-bottom:12px;line-height:1.4;
+    }
+    .obs-text{
+      font-size:13px;color:var(--t2);line-height:1.6;
+    }
+
+    /* ===== VISUAL FRAMEWORK BOX ===== */
+    .vf{
+      background:var(--bg3);border:1px solid var(--bdr);
+      border-radius:10px;padding:32px;margin:32px 0;
+      overflow-x:auto;
+    }
+    .vf-label{
+      font-family:'JetBrains Mono',monospace;font-size:10.5px;
+      text-transform:uppercase;letter-spacing:0.1em;
+      color:var(--t3);margin-bottom:20px;
+    }
+    .vf-svg{
+      width:100%;min-height:300px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .vf-desc{
+      font-size:13px;color:var(--t2);line-height:1.6;
+      margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr);
+    }
+
+    /* ===== COMPARISON TABLE ===== */
+    .comp-table{
+      width:100%;border-collapse:collapse;
+      margin:28px 0;font-size:13px;
+    }
+    .comp-table th{
+      background:var(--bg4);border:1px solid var(--bdr);
+      padding:14px;text-align:left;font-weight:700;
+      color:var(--t1);font-family:'JetBrains Mono',monospace;
+      font-size:11px;letter-spacing:0.05em;
+    }
+    .comp-table td{
+      border:1px solid var(--bdr);padding:14px;
+      color:var(--t2);
+    }
+    .comp-table tr:nth-child(even) td{background:var(--bg4);}
+    .comp-table .bad{color:#ef6b62;}
+    .comp-table .good{color:var(--accent);}
+
+    /* ===== BUYER MATRIX ===== */
+    .buyer-matrix{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;
+      margin:28px 0;
+    }
+    @media(max-width:900px){
+      .buyer-matrix{grid-template-columns:1fr;}
+    }
+    .buyer-col{
+      background:var(--bg3);border:1px solid var(--bdr);
+      border-radius:8px;padding:24px;
+    }
+    .buyer-role{
+      font-size:15px;font-weight:700;color:var(--t1);
+      margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--accent);
+    }
+    .buyer-item{
+      margin-bottom:16px;
+      padding-bottom:12px;border-bottom:1px solid var(--bdr);
+    }
+    .buyer-item:last-child{border-bottom:none;margin-bottom:0;}
+    .buyer-label{
+      font-size:11px;font-weight:600;color:var(--t3);
+      text-transform:uppercase;letter-spacing:0.05em;
+      margin-bottom:6px;
+    }
+    .buyer-value{
+      font-size:14px;color:var(--t2);line-height:1.5;
+    }
+
+    /* ===== FLOW DIAGRAM ===== */
+    .flow{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;margin:28px 0;flex-wrap:wrap;
+    }
+    .flow-box{
+      background:var(--bg4);border:1px solid var(--bdr);
+      border-radius:8px;padding:16px 20px;
+      min-width:140px;text-align:center;
+      flex:1;min-width:100px;
+    }
+    .flow-box-title{
+      font-size:13px;font-weight:700;color:var(--t1);
+      margin-bottom:8px;
+    }
+    .flow-box-desc{
+      font-size:12px;color:var(--t2);
+    }
+    .flow-arrow{
+      font-size:20px;color:var(--accent);flex-shrink:0;
+    }
+    @media(max-width:760px){
+      .flow{flex-direction:column;}
+      .flow-arrow{transform:rotate(90deg);}
+    }
+
+    /* ===== MESSAGING LADDER ===== */
+    .ladder{
+      margin:28px 0;
+    }
+    .ladder-step{
+      background:var(--bg4);border-left:3px solid var(--accent);
+      padding:16px 20px;margin-bottom:12px;border-radius:4px;
+      font-size:13px;color:var(--t2);line-height:1.6;
+    }
+    .ladder-step strong{color:var(--t1);font-weight:600;}
+
+    /* ===== FOOTER ===== */
+    footer{
+      background:var(--bg2);border-top:1px solid var(--bdr);
+      padding:48px 5vw 32px;
+    }
+    .footer-wrap{max-width:1200px;margin:0 auto;}
+    .footer-hed{
+      font-size:13px;font-weight:700;color:var(--t1);
+      text-transform:uppercase;letter-spacing:0.1em;
+      margin-bottom:16px;
+    }
+    .footer-links{
+      display:flex;gap:24px;flex-wrap:wrap;
+    }
+    .footer-link{
+      font-size:13px;color:var(--t2);transition:color 0.2s;
+    }
+    .footer-link:hover{color:var(--accent);}
+    .footer-divider{
+      width:1px;height:16px;background:var(--bdr);
+    }
+    .footer-note{
+      font-size:12px;color:var(--t3);margin-top:24px;
+      line-height:1.6;
+    }
+
+    /* ===== WORK GRID ===== */
+    .work-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:24px;margin-top:32px;
+    }
+    .work-card{
+      background:var(--bg3);border:1px solid var(--bdr);
+      border-radius:10px;padding:24px;
+      transition:all 0.2s;
+      cursor:pointer;
+    }
+    .work-card:hover{
+      border-color:var(--accent);
+      background:var(--bg4);
+    }
+    .work-label{
+      font-family:'JetBrains Mono',monospace;
+      font-size:10px;text-transform:uppercase;
+      letter-spacing:0.08em;color:var(--t3);margin-bottom:8px;
+    }
+    .work-title{
+      font-size:17px;font-weight:700;color:var(--t1);
+      margin-bottom:10px;line-height:1.3;
+    }
+    .work-desc{
+      font-size:13px;color:var(--t2);line-height:1.6;
+    }
+
+    .mono{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t2);}
+    .accent{color:var(--accent);}
+    .warm{color:var(--warm);}
+
+  </style>
+</head>
+<body>
+
+  <div class="pbar"></div>
+
+  <nav class="nav">
+    <div class="nav-i">
+      <a href="#top" class="nav-brand">
+        <div class="dot"></div>
+        <b>Loop</b>
+        <span>PMM Strategy</span>
+      </a>
+      <div class="nav-links">
+        <a href="#observations" class="np">Observations</a>
+        <a href="#buyers" class="np">Buyers</a>
+        <a href="#messaging" class="np">Messaging</a>
+        <a href="#competitive" class="np">Competitive</a>
+        <a href="#sales" class="np">Sales</a>
+        <a href="#proof" class="np">Proof</a>
+        <a href="https://drive.google.com/file/d/1RDcSAcu8GPJ6M13-NiWTovYNhdmTU3Xl/view" class="np cta">Resume</a>
+      </div>
+      <button class="hbg" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mob-menu">
+    <a href="#observations">Observations</a>
+    <a href="#buyers">Buyers</a>
+    <a href="#messaging">Messaging</a>
+    <a href="#competitive">Competitive</a>
+    <a href="#sales">Sales</a>
+    <a href="#proof">Proof</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-eyebrow rv">Loop PMM Strategy</div>
+    <h1 class="hero-hed rv">How I'd position Loop as the category every restaurant operator needs to understand.</h1>
+    <p class="hero-sub rv">Loop isn't competing with restaurant software. It's creating a new category. This document shows how I'd position, message, and launch it.</p>
+
+    <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--bdr);" class="rv">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:0;">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Inputs</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.8;">
+            Loop's website<br>
+            Hiring brief<br>
+            Public messaging<br>
+            Buyer landscape
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Deliverables</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.8;">
+            ✓ Observations<br>
+            ✓ Buyer messaging<br>
+            ✓ Messaging hierarchy<br>
+            ✓ Competitive positioning<br>
+            ✓ Sales strategy<br>
+            ✓ Proof architecture
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--bdr);font-size:12px;color:var(--t3);font-style:italic;">
+        Estimated reading time: 5 minutes
+      </div>
+    </div>
+  </section>
+
+  <!-- STRATEGIC OBSERVATIONS -->
+  <section class="part" id="observations">
+    <div class="wrap">
+      <h2 class="part-hed rv">What I observed about Loop's positioning opportunity</h2>
+      
+      <div style="font-size:11.5px;color:var(--t3);font-style:italic;margin-bottom:28px;">
+        Note: Numbers are illustrative unless sourced from Loop's public materials.
+      </div>
+
+      <div class="obs-grid rv">
+        <div class="obs-card">
+          <div class="obs-num">Observation 1</div>
+          <div class="obs-title">Current: Product-first messaging</div>
+          <div class="obs-text">Opportunity: Lead with operator pain, not AI. "Saves 20 hours weekly" lands faster than "AI agents for back-office automation."</div>
+        </div>
+
+        <div class="obs-card">
+          <div class="obs-num">Observation 2</div>
+          <div class="obs-title">Current: Feature-oriented proof</div>
+          <div class="obs-text">Opportunity: Show operator outcomes. CFO case studies should highlight time saved and margin visibility, not technical capabilities.</div>
+        </div>
+
+        <div class="obs-card">
+          <div class="obs-num">Observation 3</div>
+          <div class="obs-title">Current: One message for all buyers</div>
+          <div class="obs-text">Opportunity: Three separate narratives. CFO hears P&L impact. GM hears labor impact. Marketing hears customer insights impact.</div>
+        </div>
+
+        <div class="obs-card">
+          <div class="obs-num">Observation 4</div>
+          <div class="obs-title">Current: Positioning vs competitors</div>
+          <div class="obs-text">Opportunity: Position against manual coordination, not ERP/BI tools. Loop doesn't beat NetSuite. It replaces spreadsheets and email.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE MULTI-BUYER PROBLEM -->
+  <section class="part" id="buyers">
+    <div class="wrap">
+      <h2 class="part-hed rv">Why same product, three different conversations</h2>
+
+      <div class="buyer-matrix rv">
+        <div class="buyer-col">
+          <div class="buyer-role">CFO</div>
+          <div class="buyer-item">
+            <div class="buyer-label">Pain</div>
+            <div class="buyer-value">• 4-hour daily close<br>• Month-end visibility<br>• Margin leaks hidden</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Cares About</div>
+            <div class="buyer-value">• Accuracy<br>• Speed<br>• Margin visibility</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Proof</div>
+            <div class="buyer-value">• Close time cuts by 50%<br>• Margin leaks caught daily<br>• Finance shifts to strategy</div>
+          </div>
+        </div>
+
+        <div class="buyer-col">
+          <div class="buyer-role">General Manager</div>
+          <div class="buyer-item">
+            <div class="buyer-label">Pain</div>
+            <div class="buyer-value">• Labor = 30% costs<br>• Scheduling reactive<br>• No pattern visibility</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Cares About</div>
+            <div class="buyer-value">• Cost control<br>• Service quality<br>• Crew satisfaction</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Proof</div>
+            <div class="buyer-value">• Labor optimized weekly<br>• Crews schedule consistent<br>• [Customer savings]</div>
+          </div>
+        </div>
+
+        <div class="buyer-col">
+          <div class="buyer-role">Marketing</div>
+          <div class="buyer-item">
+            <div class="buyer-label">Pain</div>
+            <div class="buyer-value">• Can't predict churn<br>• Data fragmented<br>• Campaigns are guesses</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Cares About</div>
+            <div class="buyer-value">• Churn prediction<br>• Segment targeting<br>• Campaign ROI</div>
+          </div>
+          <div class="buyer-item">
+            <div class="buyer-label">Proof</div>
+            <div class="buyer-value">• Churn predictions [accuracy]<br>• Right segment targeting<br>• Daily insights automated</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MESSAGING ARCHITECTURE -->
+  <section class="part" id="messaging">
+    <div class="wrap">
+      <h2 class="part-hed rv">The messaging framework</h2>
+
+      <div class="part-sub rv">
+        Key principle: explain outcomes, not AI.
+      </div>
+
+      <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:20px;margin:28px 0;">
+        <div style="font-size:13px;color:var(--t1);margin-bottom:12px;font-weight:600;">What not to say</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">
+          "Loop deploys AI agents that use real-time data integration and multi-agent coordination to optimize decision workflows."
+        </div>
+        <div style="font-size:13px;color:var(--t1);margin-bottom:12px;font-weight:600;">What to say instead</div>
+        <div style="font-size:13px;color:var(--t2);">
+          "Loop handles the decisions that eat your day. P&L reconciliation. Labor scheduling. Customer insights. Done automatically."
+        </div>
+      </div>
+
+      <div class="comp-table rv">
+        <thead>
+          <tr>
+            <th>Avoid</th>
+            <th>Use Instead</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="bad">Multi-agent AI</td>
+            <td class="good">Coordinates across finance, ops, marketing</td>
+            <td>Speaks their function language</td>
+          </tr>
+          <tr>
+            <td class="bad">RAG, Fine-tuning, LLM inference</td>
+            <td class="good">Learns your restaurant patterns</td>
+            <td>Outcome focused, not tech focused</td>
+          </tr>
+          <tr>
+            <td class="bad">Real-time data integration</td>
+            <td class="good">Sees everything happening right now</td>
+            <td>Concrete, tangible</td>
+          </tr>
+          <tr>
+            <td class="bad">Optimization algorithms</td>
+            <td class="good">Finds the best choice automatically</td>
+            <td>Believable and human</td>
+          </tr>
+          <tr>
+            <td class="bad">Saves time on workflows</td>
+            <td class="good">Saves 20 hours per week per manager</td>
+            <td>Specific, measurable impact</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size:18px;font-weight:700;color:var(--t1);margin-top:40px;margin-bottom:24px;">Messaging Hierarchy</h3>
+
+      <div style="background:var(--bg4);border:1px solid var(--bdr);border-radius:10px;padding:28px;margin:28px 0;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:6px;">Loop: Restaurant Intelligence</div>
+          <div style="font-size:13px;color:var(--t2);">Coordinates finance, ops, marketing. No spreadsheets or delays.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin:28px 0;padding:28px 0;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);">
+          <div style="text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:8px;">For CFO</div>
+            <div style="font-size:12px;color:var(--t2);">P&L close 50% faster. Margin visibility daily.</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:8px;">For GM</div>
+            <div style="font-size:12px;color:var(--t2);">Labor optimized. Schedules consistent.</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:8px;">For Marketing</div>
+            <div style="font-size:12px;color:var(--t2);">Churn prediction. Segments automated.</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <div style="font-size:13px;color:var(--t2);">Proof: Customer case study showing function-specific impact with metrics.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPETITIVE POSITIONING -->
+  <section class="part" id="competitive">
+    <div class="wrap">
+      <h2 class="part-hed rv">What operators actually buy</h2>
+
+      <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:40px;margin:32px 0;" class="rv">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:0;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Today (Status Quo)</div>
+            <div style="font-size:14px;color:var(--t1);line-height:2;font-weight:600;">
+              Finance Tool<br>
+              <span style="color:var(--t3);font-weight:400;">Reconciles transactions</span><br><br>
+              Operations Tool<br>
+              <span style="color:var(--t3);font-weight:400;">Tracks labor</span><br><br>
+              Marketing Tool<br>
+              <span style="color:var(--t3);font-weight:400;">Sends campaigns</span><br><br>
+              <span style="color:#ef6b62;font-weight:700;margin-top:16px;display:block;">+ Manual coordination<br>= Hours of meetings</span>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">With Loop</div>
+            <div style="font-size:14px;color:var(--t1);line-height:2;font-weight:600;">
+              Single Intelligence System<br>
+              <span style="color:var(--t3);font-weight:400;">Coordinates all three</span><br><br>
+              Finance decisions<br>
+              <span style="color:var(--accent);font-weight:400;">→ Automatic</span><br><br>
+              Operations decisions<br>
+              <span style="color:var(--accent);font-weight:400;">→ Automatic</span><br><br>
+              <span style="color:var(--accent);font-weight:700;margin-top:16px;display:block;">= One system, all insights<br>delivered without asking</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:40px;padding-top:28px;border-top:1px solid var(--bdr);">
+          <div style="font-size:13px;color:var(--accent);font-weight:700;margin-bottom:8px;">What operators really buy</div>
+          <div style="font-size:14px;color:var(--t1);font-weight:600;">Confidence that decisions are made right, fast, automatically.</div>
+        </div>
+      </div>
+
+      <h2 class="part-hed rv" style="margin-top:56px;">Why Loop wins the competitive conversation</h2>
+
+      <div class="vf rv">
+        <div class="vf-label">What Operators Use Today vs What Loop Does</div>
+        <div style="overflow-x:auto;">
+          <table class="comp-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>What they use today</th>
+                <th>What it does</th>
+                <th>Loop does this instead</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Accounting software (NetSuite, QuickBooks)</td>
+                <td>Records transactions. Requires 4 hrs daily reconciliation.</td>
+                <td>Reconciles automatically while transactions happen. Finance team moves to strategy.</td>
+              </tr>
+              <tr>
+                <td>BI tools (Tableau, Looker)</td>
+                <td>Shows dashboards. Requires analysts to interpret them.</td>
+                <td>Interprets the data and delivers insights unprompted.</td>
+              </tr>
+              <tr>
+                <td>Labor management (Toast, Square)</td>
+                <td>Tracks hours. Scheduling is still manual.</td>
+                <td>Schedules automatically based on demand, cost, and service.</td>
+              </tr>
+              <tr>
+                <td>Email marketing (Klaviyo, Mailchimp)</td>
+                <td>Sends campaigns operators design.</td>
+                <td>Predicts churn and delivers insights before operators ask.</td>
+              </tr>
+              <tr>
+                <td style="background:var(--bg5);font-weight:700;">Real competitor</td>
+                <td style="background:var(--bg5);font-weight:700;">Manual coordination between 5 systems, spreadsheets, email</td>
+                <td style="background:var(--bg5);font-weight:700;color:var(--accent);">One system that coordinates everything</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="vf-desc">
+          The framing shift: Loop doesn't win by being better than accounting software. It wins by being the only platform that eliminates the need to coordinate between them.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SALES ARCHITECTURE -->
+  <section class="part" id="sales">
+    <div class="wrap">
+      <h2 class="part-hed rv">How to sell Loop when operators have never imagined it</h2>
+
+      <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:20px;margin-top:28px;">The Three-Call Narrative</h3>
+
+      <div class="flow rv">
+        <div class="flow-box">
+          <div class="flow-box-title">Call 1</div>
+          <div class="flow-box-desc">Diagnose their pain. Ask how they spend their day. Never pitch.</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">
+          <div class="flow-box-title">Call 2</div>
+          <div class="flow-box-desc">Show proof. One relevant case study. One function. That's it.</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">
+          <div class="flow-box-title">Call 3</div>
+          <div class="flow-box-desc">Co-build. Spend 4 hours with their team. Custom proposal.</div>
+        </div>
+      </div>
+
+      <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:20px;margin-top:40px;">Handling Objections</h3>
+
+      <div class="comp-table rv">
+        <thead>
+          <tr>
+            <th>What they'll say</th>
+            <th>What they're really asking</th>
+            <th>How to respond</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"We already use accounting software."</td>
+            <td>Why do we need another system?</td>
+            <td>"You do. Loop doesn't replace NetSuite. It makes reconciliation automatic so your team does strategy instead of busywork."</td>
+          </tr>
+          <tr>
+            <td>"We're not ready for AI."</td>
+            <td>Is this too risky or unproven?</td>
+            <td>"You use AI already. The question isn't whether to use it. It's whether it saves you time. Show me your reconciliation process right now. Loop cuts it from 4 hours to 1."</td>
+          </tr>
+          <tr>
+            <td>"This is too complex."</td>
+            <td>Will this be hard to implement?</td>
+            <td>"Actually simpler than what you're doing now. You don't need to change anything. Loop plugs into your existing systems. Your team sees the same data, just with work already done."</td>
+          </tr>
+          <tr>
+            <td>"How do we know it works?"</td>
+            <td>Show me proof from someone like us.</td>
+            <td>"Let's do a pilot on one function. Four weeks. We'll measure before and after on the exact metric that matters to you."</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PROOF STRATEGY -->
+  <section class="part" id="proof">
+    <div class="wrap">
+      <h2 class="part-hed rv">Converting early wins into proof that scales</h2>
+
+      <div class="comp-table rv">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Action</th>
+            <th>Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;">Interview</td>
+            <td>"What did you think Loop was vs. what is it?"</td>
+            <td>Positioning gold</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">Extract</td>
+            <td>Quantify: hours saved, dollars earned, customers retained</td>
+            <td>Defensible metrics</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">Case Study</td>
+            <td>Write one per function (finance, ops, marketing). Same customer.</td>
+            <td>Three assets, one story</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">Video</td>
+            <td>Operator explains result in their own words</td>
+            <td>High credibility asset</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">Sales Asset</td>
+            <td>Battlecard / objection handler for each buyer</td>
+            <td>Sales ready</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:20px;margin-top:40px;">What Each Buyer Needs</h3>
+
+      <div class="comp-table rv" style="margin-bottom:0;">
+        <thead>
+          <tr>
+            <th>Buyer</th>
+            <th>KPI to Prove</th>
+            <th>Asset Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;">CFO</td>
+            <td>P&L close time, margin captured</td>
+            <td>Case study + before/after dashboard</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">GM</td>
+            <td>Labor cost savings, schedule consistency</td>
+            <td>Case study + operator testimonial video</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;">Marketing</td>
+            <td>Churn prediction accuracy, campaign ROI</td>
+            <td>Case study + dashboard screenshot</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-wrap">
+      <div class="footer-hed">Connect</div>
+      <div class="footer-links">
+        <a href="https://linkedin.com/in/bhanuexcalibur" class="footer-link" target="_blank" rel="noopener">LinkedIn</a>
+        <div class="footer-divider"></div>
+        <a href="https://drive.google.com/file/d/1RDcSAcu8GPJ6M13-NiWTovYNhdmTU3Xl/view" class="footer-link" target="_blank" rel="noopener">Resume</a>
+        <div class="footer-divider"></div>
+        <a href="mailto:bhanukumar0902@gmail.com" class="footer-link">Email</a>
+      </div>
+      <div class="footer-note">
+        PMM strategy for Loop AI. Grounded in observations about current positioning gaps, multi-buyer sales complexity, and how to position category creation in vertical software.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const pbar = document.querySelector('.pbar');
+    window.addEventListener('scroll', function() {
+      const scrollPct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      pbar.style.width = scrollPct + '%';
+    });
+
+    const hbg = document.querySelector('.hbg');
+    const mobMenu = document.querySelector('.mob-menu');
+    if(hbg) {
+      hbg.addEventListener('click', function() {
+        hbg.classList.toggle('open');
+        mobMenu.classList.toggle('open');
+      });
+      mobMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function() {
+          hbg.classList.remove('open');
+          mobMenu.classList.remove('open');
+        });
+      });
+    }
+
+    const rvIo = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if(e.isIntersecting) {
+          e.target.classList.add('in');
+        }
+      });
+    }, {threshold: 0.1});
+    document.querySelectorAll('.rv').forEach(el => rvIo.observe(el));
+  </script>
+
+</body>
+</html>
